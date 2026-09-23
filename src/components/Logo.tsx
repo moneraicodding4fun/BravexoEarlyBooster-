@@ -9,7 +9,7 @@ export function LogoMark({ className }: { className?: string }) {
         className,
       )}
     >
-      <Rocket className="h-4.5 w-4.5 h-5 w-5 -rotate-45 text-[#04150d]" strokeWidth={2.4} />
+      <Rocket className="h-[18px] w-[18px] -rotate-45 text-[#04150d]" strokeWidth={2.5} />
     </span>
   )
 }

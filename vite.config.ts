@@ -2,8 +2,13 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 
+// VITE_BASE lets the GitHub Pages build serve from /<repo>/ while local
+// dev/preview keeps serving from the root.
+const base = process.env.VITE_BASE || '/'
+
 // https://vitejs.dev/config/
 export default defineConfig({
+  base,
   plugins: [react()],
   resolve: {
     alias: {

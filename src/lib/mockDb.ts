@@ -478,5 +478,8 @@ export function openInviteFor(db: DB, clientId: string): Invite | undefined {
 }
 
 export function inviteUrl(token: string) {
-  return `${window.location.origin}/login?invite=${token}`
+  // BASE_URL keeps invite links correct when deployed under a sub-path
+  // (e.g. a GitHub Pages project site).
+  const base = import.meta.env.BASE_URL || '/'
+  return `${window.location.origin}${base}login?invite=${token}`
 }
