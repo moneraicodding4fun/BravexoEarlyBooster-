@@ -199,7 +199,7 @@ export function ClientsPage() {
           <h1 className="font-display text-2xl font-bold text-white">Client Workspaces</h1>
           <p className="mt-1 text-sm text-muted-foreground">Onboard companies from any industry into isolated portals.</p>
         </div>
-        <Button onClick={() => setInviteOpen(true)} className="animate-pulse-glow font-semibold">
+        <Button onClick={() => setInviteOpen(true)} className="bg-white font-semibold text-zinc-950 hover:bg-zinc-200">
           <Plus className="h-4 w-4" /> Invite User
         </Button>
       </div>

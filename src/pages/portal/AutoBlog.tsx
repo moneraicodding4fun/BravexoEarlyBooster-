@@ -165,7 +165,7 @@ export function AutoBlogPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={generate} disabled={busy} className="h-11 w-full font-semibold animate-pulse-glow">
+            <Button onClick={generate} disabled={busy} className="h-11 w-full bg-white font-semibold text-zinc-950 hover:bg-zinc-200">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
               {busy ? 'Routing to free-tier AI…' : 'Generate SEO article'}
             </Button>

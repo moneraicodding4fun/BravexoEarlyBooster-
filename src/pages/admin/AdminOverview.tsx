@@ -12,15 +12,15 @@ import { timeAgo } from '@/lib/utils'
 function Stat({ icon: Icon, label, value, hint, delay }: { icon: typeof Users; label: string; value: string; hint?: string; delay: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.35 }}>
-      <Card className="bx-glass border-white/10 bg-transparent">
+      <Card className="border-white/[0.07] bg-white/[0.02]">
         <CardContent className="p-5">
           <div className="flex items-center justify-between">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-300">
-              <Icon className="h-5 w-5" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-zinc-300">
+              <Icon className="h-4 w-4" />
             </span>
             {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
           </div>
-          <p className="font-display mt-4 text-2xl font-bold text-white">{value}</p>
+          <p className="mt-4 text-2xl font-semibold tracking-tight text-white">{value}</p>
           <p className="mt-1 text-xs text-muted-foreground">{label}</p>
         </CardContent>
       </Card>

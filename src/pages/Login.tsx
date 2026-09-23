@@ -10,7 +10,6 @@ import {
   Loader2,
   ShieldCheck,
   AlertTriangle,
-  Sparkles,
   Newspaper,
   MessageSquare,
   PlugZap,
@@ -96,10 +95,6 @@ export function Login() {
     <div className="bx-app grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
       {/* ---------- Brand panel ---------- */}
       <div className="relative hidden overflow-hidden border-r border-white/5 lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="pointer-events-none absolute inset-0 bx-grid-bg" />
-        <div className="pointer-events-none absolute -left-32 top-1/4 h-[420px] w-[420px] rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 right-0 h-[360px] w-[360px] rounded-full bg-cyan-500/10 blur-3xl" />
-
         <Link to={ROUTES.home} className="relative inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-white">
           <ArrowLeft className="h-4 w-4" /> Back to site
         </Link>
@@ -107,30 +102,29 @@ export function Login() {
         <div className="relative">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="flex items-center gap-3">
-              <LogoMark className="h-11 w-11" />
+              <LogoMark className="h-10 w-10" />
               <div>
-                <p className="font-display text-xl font-bold text-white">
-                  Bravexo <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">EarlyBooster</span>
+                <p className="text-lg font-semibold tracking-tight text-white">
+                  Bravexo <span className="font-normal text-zinc-400">EarlyBooster</span>
                 </p>
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Universal content engine</p>
+                <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Universal content engine</p>
               </div>
             </div>
-            <h1 className="font-display mt-10 max-w-md text-4xl font-bold leading-tight tracking-tight text-white">
-              One brain for
-              <span className="block bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">every website you run.</span>
+            <h1 className="mt-12 max-w-md text-4xl font-semibold leading-[1.12] tracking-[-0.02em] text-white">
+              One content engine for every website you run.
             </h1>
           </motion.div>
-          <div className="mt-10 space-y-3.5">
+          <div className="mt-10 space-y-3">
             {PERKS.map((p, i) => (
               <motion.div
                 key={p.text}
-                initial={{ opacity: 0, x: -14 }}
+                initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.25 + i * 0.08 }}
                 className="flex items-center gap-3 text-sm text-zinc-300"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-400/25 bg-emerald-500/10 text-emerald-300">
-                  <p.icon className="h-4 w-4" />
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
+                  <p.icon className="h-4 w-4 text-emerald-400" />
                 </span>
                 {p.text}
               </motion.div>
@@ -146,7 +140,6 @@ export function Login() {
 
       {/* ---------- Form panel ---------- */}
       <div className="relative flex items-center justify-center p-4 sm:p-8">
-        <div className="pointer-events-none absolute inset-0 bx-grid-bg lg:hidden" />
         <motion.div
           initial={{ opacity: 0, y: 18, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -259,8 +252,8 @@ export function Login() {
                 </div>
               )}
 
-              <Button type="submit" disabled={busy} className="h-11 w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-sm font-bold text-[#04150d] shadow-[0_0_28px_rgba(16,185,129,0.3)] hover:from-emerald-400 hover:to-cyan-400">
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              <Button type="submit" disabled={busy} className="h-11 w-full bg-white text-sm font-semibold text-zinc-950 hover:bg-zinc-200">
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {mode === 'signin' ? 'Sign in to your workspace' : hasValidInvite ? 'Activate my workspace' : isMasterEmail ? 'Create Master Admin' : 'Request access'}
               </Button>
             </form>
@@ -285,10 +278,10 @@ export function Login() {
                       setEmail(MASTER_ADMIN_EMAIL)
                       setPassword('EarlyBooster!2026')
                     }}
-                    className="flex items-center justify-between rounded-xl border border-emerald-400/20 bg-emerald-500/5 px-3.5 py-2.5 text-left transition hover:border-emerald-400/40 hover:bg-emerald-500/10"
+                    className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5 text-left transition hover:border-white/20 hover:bg-white/[0.04]"
                   >
                     <span>
-                      <span className="block text-xs font-semibold text-emerald-300">Master Admin</span>
+                      <span className="block text-xs font-semibold text-white">Master Admin</span>
                       <span className="block truncate font-mono text-[11px] text-zinc-400">{MASTER_ADMIN_EMAIL}</span>
                     </span>
                     <span className="text-[10px] text-zinc-500">click to fill</span>
@@ -300,10 +293,10 @@ export function Login() {
                       setEmail('demo@luxeautospa.com')
                       setPassword('ClientDemo!2026')
                     }}
-                    className="flex items-center justify-between rounded-xl border border-cyan-400/20 bg-cyan-500/5 px-3.5 py-2.5 text-left transition hover:border-cyan-400/40 hover:bg-cyan-500/10"
+                    className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5 text-left transition hover:border-white/20 hover:bg-white/[0.04]"
                   >
                     <span>
-                      <span className="block text-xs font-semibold text-cyan-300">Client workspace</span>
+                      <span className="block text-xs font-semibold text-white">Client workspace</span>
                       <span className="block truncate font-mono text-[11px] text-zinc-400">demo@luxeautospa.com</span>
                     </span>
                     <span className="text-[10px] text-zinc-500">click to fill</span>

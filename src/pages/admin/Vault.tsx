@@ -143,23 +143,23 @@ export function VaultPage() {
       </div>
 
       {/* Guarantee banner */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-emerald-400/25 bg-gradient-to-r from-emerald-500/10 to-cyan-500/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300">
-            <ShieldCheck className="h-6 w-6" />
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-emerald-400">
+            <ShieldCheck className="h-5 w-5" />
           </span>
           <div>
-            <p className="font-display text-lg font-bold text-white">Zero-cost guarantee</p>
+            <p className="text-[15px] font-semibold text-white">Zero-cost guarantee</p>
             <p className="text-sm text-muted-foreground">Priority routing → automatic fallback → built-in Local Engine.</p>
           </div>
         </div>
-        <div className="flex items-center gap-6 text-center">
+        <div className="flex items-center gap-8 text-center">
           <div>
-            <p className="font-display text-2xl font-bold text-emerald-300">$0.00</p>
+            <p className="text-2xl font-semibold tracking-tight text-emerald-300">$0.00</p>
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Monthly AI spend</p>
           </div>
           <div>
-            <p className="font-display text-2xl font-bold text-white">{keys.length + 1}</p>
+            <p className="text-2xl font-semibold tracking-tight text-white">{keys.length + 1}</p>
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Routes available</p>
           </div>
         </div>

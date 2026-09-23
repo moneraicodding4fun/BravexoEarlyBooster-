@@ -118,9 +118,9 @@ export function AppShell({ section, children }: { section: 'admin' | 'portal'; c
               transition={{ duration: 0.15 }}
               className="min-w-0"
             >
-              <p className="font-display truncate text-[15px] font-bold leading-none text-white">
+              <p className="truncate text-[15px] font-semibold tracking-tight leading-none text-white">
                 {APP_SHORT_NAME}
-                <span className="ml-1 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">EarlyBooster</span>
+                <span className="ml-1 font-normal text-zinc-400">EarlyBooster</span>
               </p>
               <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
                 {section === 'admin' ? 'Master Admin' : 'Client Portal'}
@@ -154,11 +154,11 @@ export function AppShell({ section, children }: { section: 'admin' | 'portal'; c
                 {isActive && (
                   <motion.span
                     layoutId={`active-pill-${section}`}
-                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/25 to-cyan-500/10 ring-1 ring-inset ring-emerald-400/30"
+                    className="absolute inset-0 rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/[0.08]"
                     transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                   />
                 )}
-                <Icon className={cn('relative z-10 h-[18px] w-[18px] shrink-0', isActive && 'text-emerald-300')} />
+                <Icon className={cn('relative z-10 h-[18px] w-[18px] shrink-0', isActive && 'text-emerald-400')} />
                 <AnimatePresence initial={false}>
                   {!hideLabels && (
                     <motion.span
@@ -181,7 +181,7 @@ export function AppShell({ section, children }: { section: 'admin' | 'portal'; c
       {/* User + collapse */}
       <div className="border-t border-white/5 p-3">
         <div className={cn('flex items-center gap-2.5 rounded-xl px-2 py-2', hideLabels && 'justify-center px-0')}>
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500/30 to-cyan-500/20 text-xs font-bold text-emerald-200 ring-1 ring-emerald-400/30">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-xs font-semibold text-white">
             {initials}
           </span>
           {!hideLabels && (

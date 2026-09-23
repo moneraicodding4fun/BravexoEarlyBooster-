@@ -215,16 +215,14 @@ export function ConnectPage() {
               </div>
 
               {/* THE deploy button */}
-              <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                <Button
-                  onClick={deploy}
-                  disabled={deploying || !draft}
-                  className="h-14 w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-base font-bold text-[#04150d] shadow-[0_0_40px_rgba(16,185,129,0.35)] hover:from-emerald-400 hover:to-cyan-400"
-                >
-                  {deploying ? <Loader2 className="h-5 w-5 animate-spin" /> : <Rocket className="h-5 w-5" />}
-                  {deploying ? 'Deploying content…' : dryRun ? 'Deploy Content (Dry-run)' : 'Deploy Content'}
-                </Button>
-              </motion.div>
+              <Button
+                onClick={deploy}
+                disabled={deploying || !draft}
+                className="h-12 w-full bg-emerald-500 text-[15px] font-semibold text-zinc-950 hover:bg-emerald-400"
+              >
+                {deploying ? <Loader2 className="h-5 w-5 animate-spin" /> : <Rocket className="h-5 w-5" />}
+                {deploying ? 'Deploying content…' : dryRun ? 'Deploy Content (Dry-run)' : 'Deploy Content'}
+              </Button>
               {!site && !dryRun && (
                 <p className="flex items-center gap-1.5 text-xs text-amber-300">
                   <AlertTriangle className="h-3.5 w-3.5" /> No target selected — connect a webhook below or keep dry-run on.

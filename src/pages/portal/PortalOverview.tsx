@@ -50,7 +50,7 @@ export function PortalOverview() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold text-white">Welcome back, {session?.name.split(' ')[0]} 👋</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-white">Welcome back, {session?.name.split(' ')[0]}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {client ? (
               <>
@@ -89,14 +89,14 @@ export function PortalOverview() {
         {quickLinks.map((q, i) => (
           <motion.div key={q.to} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>
             <Link to={q.to}>
-              <Card className="bx-glass group h-full border-white/10 bg-transparent transition hover:border-emerald-400/30">
+              <Card className="group h-full border-white/[0.07] bg-white/[0.02] transition-colors hover:border-white/[0.16]">
                 <CardContent className="p-5">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-300">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-emerald-400">
                     <q.icon className="h-5 w-5" />
                   </span>
-                  <h3 className="mt-4 font-display text-base font-semibold text-white">{q.title}</h3>
+                  <h3 className="mt-4 text-[15px] font-semibold text-white">{q.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{q.body}</p>
-                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-300 transition group-hover:gap-2.5">
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300 transition group-hover:gap-2.5 group-hover:text-white">
                     {q.cta} <ArrowRight className="h-4 w-4" />
                   </span>
                 </CardContent>

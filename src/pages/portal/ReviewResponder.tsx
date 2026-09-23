@@ -128,7 +128,7 @@ export function ReviewResponder() {
               <Label htmlFor="note">Extra context (optional)</Label>
               <Input id="note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. offer a free top-up to make it right" />
             </div>
-            <Button onClick={generate} disabled={busy} className="w-full h-11 font-semibold animate-pulse-glow">
+            <Button onClick={generate} disabled={busy} className="h-11 w-full bg-white font-semibold text-zinc-950 hover:bg-zinc-200">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
               {busy ? 'Generating…' : 'Generate response'}
             </Button>
