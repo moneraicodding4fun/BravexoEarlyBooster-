@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -14,6 +14,7 @@ import {
   MessageSquare,
   PlugZap,
   Zap,
+  MailCheck,
 } from 'lucide-react'
 import { LogoMark } from '@/components/Logo'
 import { Button } from '@/components/ui/button'
@@ -21,6 +22,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/lib/auth'
 import { toast } from '@/lib/toast'
+import { generateOtp, sendOtpEmail } from '@/lib/mailer'
 import { ROUTES, MASTER_ADMIN_EMAIL, APP_NAME } from '@/lib/constants'
 
 const PERKS = [
@@ -31,7 +33,7 @@ const PERKS = [
 ]
 
 export function Login() {
-  const { login, register, resolveInvite, demoMode } = useAuth()
+  const { login, register, resolveInvite } = useAuth()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const inviteToken = params.get('invite') ?? undefined
@@ -48,6 +50,14 @@ export function Login() {
   const [name, setName] = useState('')
   const [confirm, setConfirm] = useState('')
 
+  /* --- Gmail OTP verification for the Master Admin account --- */
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpInput, setOtpInput] = useState('')
+  const [otpVerified, setOtpVerified] = useState(false)
+  const [sendingOtp, setSendingOtp] = useState(false)
+  const [activationNeeded, setActivationNeeded] = useState(false)
+  const otpRef = useRef<string | null>(null)
+
   const isMasterEmail = email.trim().toLowerCase() === MASTER_ADMIN_EMAIL
 
   useEffect(() => {
@@ -63,9 +73,53 @@ export function Login() {
     }
   }, [inviteToken, resolveInvite])
 
+  // Reset OTP state whenever the email changes.
+  useEffect(() => {
+    setOtpSent(false)
+    setOtpVerified(false)
+    setOtpInput('')
+    otpRef.current = null
+    setActivationNeeded(false)
+  }, [email])
+
+  async function sendOtp() {
+    setSendingOtp(true)
+    setError(null)
+    const code = generateOtp()
+    otpRef.current = code
+    const res = await sendOtpEmail(email.trim(), code)
+    setSendingOtp(false)
+    if (!res.ok) {
+      setError(`Could not send the verification email. ${res.error ?? ''}`)
+      toast({ title: 'Verification email failed', description: res.error, variant: 'error' })
+      return
+    }
+    setOtpSent(true)
+    setActivationNeeded(Boolean(res.activationRequired))
+    toast({
+      title: 'Verification code sent',
+      description: 'Check your Gmail inbox and enter the 6-digit code.',
+      variant: 'success',
+    })
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+
+    if (mode === 'register' && isMasterEmail && !otpVerified) {
+      if (!otpRef.current) {
+        setError('Request a verification code first.')
+        return
+      }
+      if (otpInput.trim() !== otpRef.current) {
+        setError('Incorrect verification code. Check your Gmail and try again.')
+        return
+      }
+      setOtpVerified(true)
+      toast({ title: 'Email verified', description: 'Gmail ownership confirmed.', variant: 'success' })
+    }
+
     setBusy(true)
     try {
       if (mode === 'signin') {
@@ -154,7 +208,7 @@ export function Login() {
             <div className="mb-6 flex items-center gap-3">
               <LogoMark />
               <div>
-                <h2 className="font-display text-lg font-bold text-white">{APP_NAME}</h2>
+                <h2 className="text-lg font-semibold tracking-tight text-white">{APP_NAME}</h2>
                 <p className="text-xs text-muted-foreground">Invite-only access portal</p>
               </div>
             </div>
@@ -198,7 +252,7 @@ export function Login() {
                       : 'rounded-lg py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-white'
                   }
                 >
-                  {m === 'signin' ? 'Sign in' : hasValidInvite ? 'Accept invite' : 'Request access'}
+                  {m === 'signin' ? 'Sign in' : hasValidInvite ? 'Accept invite' : 'Register'}
                 </button>
               ))}
             </div>
@@ -222,10 +276,51 @@ export function Login() {
                 </div>
                 {mode === 'register' && isMasterEmail && (
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-emerald-300">
-                    <ShieldCheck className="h-3.5 w-3.5" /> Master Admin email detected — you'll receive full control.
+                    <ShieldCheck className="h-3.5 w-3.5" /> Master Admin email — Gmail OTP verification required.
                   </p>
                 )}
               </div>
+
+              {/* OTP step — Master Admin registration only */}
+              {mode === 'register' && isMasterEmail && (
+                <div className="space-y-2 rounded-xl border border-white/10 bg-white/[0.03] p-3.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs text-muted-foreground">
+                      {otpVerified ? 'Gmail ownership confirmed.' : 'We will email a 6-digit code to your Gmail.'}
+                    </p>
+                    {otpVerified ? (
+                      <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-300">
+                        <MailCheck className="h-4 w-4" /> Verified
+                      </span>
+                    ) : (
+                      <Button type="button" size="sm" variant="secondary" onClick={sendOtp} disabled={sendingOtp || otpSent}>
+                        {sendingOtp ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
+                        {otpSent ? 'Code sent' : 'Send code'}
+                      </Button>
+                    )}
+                  </div>
+                  {otpSent && !otpVerified && (
+                    <>
+                      <div className="relative">
+                        <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          className="pl-9 font-mono tracking-[0.3em]"
+                          inputMode="numeric"
+                          maxLength={6}
+                          placeholder="••••••"
+                          value={otpInput}
+                          onChange={(e) => setOtpInput(e.target.value)}
+                        />
+                      </div>
+                      {activationNeeded && (
+                        <p className="text-[11px] leading-relaxed text-amber-300/90">
+                          First time? FormSubmit sent a one-time activation email to this Gmail — click the link in it, then press “Send code” again.
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
 
               <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
@@ -263,46 +358,6 @@ export function Login() {
                 <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 Public sign-ups are disabled. You need a single-use invite link from a Bravexo administrator, or the designated Master Admin email.
               </p>
-            )}
-
-            {demoMode && (
-              <>
-                <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground">
-                  <span className="h-px flex-1 bg-white/10" /> Demo access <span className="h-px flex-1 bg-white/10" />
-                </div>
-                <div className="grid gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode('signin')
-                      setEmail(MASTER_ADMIN_EMAIL)
-                      setPassword('EarlyBooster!2026')
-                    }}
-                    className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5 text-left transition hover:border-white/20 hover:bg-white/[0.04]"
-                  >
-                    <span>
-                      <span className="block text-xs font-semibold text-white">Master Admin</span>
-                      <span className="block truncate font-mono text-[11px] text-zinc-400">{MASTER_ADMIN_EMAIL}</span>
-                    </span>
-                    <span className="text-[10px] text-zinc-500">click to fill</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode('signin')
-                      setEmail('demo@luxeautospa.com')
-                      setPassword('ClientDemo!2026')
-                    }}
-                    className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5 text-left transition hover:border-white/20 hover:bg-white/[0.04]"
-                  >
-                    <span>
-                      <span className="block text-xs font-semibold text-white">Client workspace</span>
-                      <span className="block truncate font-mono text-[11px] text-zinc-400">demo@luxeautospa.com</span>
-                    </span>
-                    <span className="text-[10px] text-zinc-500">click to fill</span>
-                  </button>
-                </div>
-              </>
             )}
           </div>
         </motion.div>

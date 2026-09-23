@@ -82,7 +82,7 @@ export function AdminOverview() {
                   <p className="text-xs text-muted-foreground">{log.provider} · {log.latencyMs}ms · {timeAgo(log.ts)}</p>
                 </div>
                 <Badge variant={log.status === 'success' ? 'success' : log.status === 'fallback' ? 'warning' : 'info'}>
-                  {log.status}
+                  {log.status === 'simulated' ? 'local' : log.status}
                 </Badge>
               </div>
             ))}

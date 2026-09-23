@@ -28,7 +28,7 @@ export function ConnectPage() {
 
   const [draftId, setDraftId] = useState<string>(preselected ?? drafts[0]?.id ?? '')
   const [siteId, setSiteId] = useState<string>(client?.connectedSites[0]?.id ?? '')
-  const [dryRun, setDryRun] = useState(true)
+  const [dryRun, setDryRun] = useState(false)
   const [deploying, setDeploying] = useState(false)
   const [showPayload, setShowPayload] = useState(false)
   const [, forceRender] = useState(0)
@@ -80,17 +80,21 @@ export function ConnectPage() {
     refresh()
   }
 
+  function hostOf(url: string) {
+    try {
+      return new URL(url.startsWith('http') ? url : `https://${url}`).host
+    } catch {
+      return url
+    }
+  }
+
   async function deploy() {
     if (!draft || !client) return
-    if (!site && !dryRun) {
-      toast({ title: 'Connect a target first', description: 'Add a webhook URL below, or keep Dry-run on.', variant: 'info' })
-      return
-    }
     setDeploying(true)
     try {
       const res = await exportDraft({
         workspace: { id: client.id, company: client.company },
-        target: { platform: site?.platform ?? 'dry-run', webhookUrl: dryRun ? undefined : site?.url },
+        target: { platform: site?.platform ?? 'unconfigured', webhookUrl: site?.url },
         dryRun,
         draft: {
           id: draft.id,
@@ -104,22 +108,22 @@ export function ConnectPage() {
         },
       })
 
-      const status = !res.ok ? 'failed' : res.mode === 'dry-run' ? 'dry-run' : res.mode === 'simulated' ? 'simulated' : 'delivered'
+      const status: 'delivered' | 'dry-run' | 'failed' = !res.ok ? 'failed' : res.mode === 'dry-run' ? 'dry-run' : 'delivered'
       mutate((d) => {
         d.deployments.unshift({
           id: uid('dep'),
           clientId: client.id,
           draftId: draft.id,
           title: draft.title,
-          platform: site?.platform ?? 'Relay',
-          target: site ? new URL(site.url.startsWith('http') ? site.url : `https://${site.url}`).host : 'simulated relay',
+          platform: site?.platform ?? '—',
+          target: site ? hostOf(site.url) : 'no target',
           status,
           ts: nowIso(),
         })
         const dd = d.drafts.find((x) => x.id === draft.id)
-        if (dd && status !== 'failed') {
+        if (dd && status === 'delivered') {
           dd.status = 'deployed'
-          dd.deployedTo = `${site?.platform ?? 'Relay'} · ${site ? new URL(site.url.startsWith('http') ? site.url : `https://${site.url}`).host : 'simulated'}`
+          dd.deployedTo = `${site?.platform ?? 'Webhook'} · ${site ? hostOf(site.url) : ''}`
           dd.deployedAt = nowIso()
         }
         const cc = d.clients.find((x) => x.id === client.id)
@@ -128,19 +132,19 @@ export function ConnectPage() {
 
       if (res.ok) {
         toast({
-          title: status === 'delivered' ? 'Content deployed! 🚀' : dryRun ? 'Dry-run successful' : 'Payload validated by relay',
+          title: status === 'delivered' ? 'Content deployed' : 'Dry-run validated',
           description:
             status === 'delivered'
-              ? `Delivered to ${site?.platform} (HTTP ${res.status ?? 200}).`
-              : 'JSON payload accepted. Connect a live webhook to publish for real.',
+              ? `Delivered to ${site?.platform}${res.status ? ` (HTTP ${res.status})` : ''}.`
+              : 'Payload validated locally. Nothing was sent.',
           variant: 'success',
         })
       } else {
-        toast({ title: 'Deployment failed', description: res.error ?? 'The target webhook rejected the payload.', variant: 'error' })
+        toast({ title: 'Deployment failed', description: res.error ?? 'The target rejected the payload.', variant: 'error' })
       }
       refresh()
     } catch (err) {
-      toast({ title: 'Relay unreachable', description: err instanceof Error ? err.message : 'Network error.', variant: 'error' })
+      toast({ title: 'Export error', description: err instanceof Error ? err.message : 'Network error.', variant: 'error' })
     } finally {
       setDeploying(false)
     }
@@ -217,16 +221,19 @@ export function ConnectPage() {
               {/* THE deploy button */}
               <Button
                 onClick={deploy}
-                disabled={deploying || !draft}
+                disabled={deploying || !draft || (!dryRun && !site)}
                 className="h-12 w-full bg-emerald-500 text-[15px] font-semibold text-zinc-950 hover:bg-emerald-400"
               >
                 {deploying ? <Loader2 className="h-5 w-5 animate-spin" /> : <Rocket className="h-5 w-5" />}
-                {deploying ? 'Deploying content…' : dryRun ? 'Deploy Content (Dry-run)' : 'Deploy Content'}
+                {deploying ? 'Deploying content…' : dryRun ? 'Validate payload (dry-run)' : 'Deploy Content'}
               </Button>
               {!site && !dryRun && (
                 <p className="flex items-center gap-1.5 text-xs text-amber-300">
-                  <AlertTriangle className="h-3.5 w-3.5" /> No target selected — connect a webhook below or keep dry-run on.
+                  <AlertTriangle className="h-3.5 w-3.5" /> No target connected — add a webhook below to enable real delivery.
                 </p>
+              )}
+              {drafts.length === 0 && (
+                <p className="text-xs text-muted-foreground">Generate an article first in the Auto-Blog Engine.</p>
               )}
             </CardContent>
           </Card>

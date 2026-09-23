@@ -14,15 +14,19 @@ import { timeAgo } from '@/lib/utils'
 
 function ProviderCard({ row, index, total, onSaved }: { row: AIKeyRow; index: number; total: number; onSaved: () => void }) {
   const [key, setKey] = useState(row.apiKey)
+  const [model, setModel] = useState(row.model)
   const [show, setShow] = useState(false)
   const [testing, setTesting] = useState(false)
 
   function save() {
     mutate((db) => {
       const r = db.aiKeys.find((k) => k.provider === row.provider)
-      if (r) r.apiKey = key.trim()
+      if (r) {
+        r.apiKey = key.trim()
+        r.model = model.trim() || r.model
+      }
     })
-    toast({ title: `${row.label} key stored`, description: 'The AI Router can now use this free-tier model.', variant: 'success' })
+    toast({ title: `${row.label} configuration stored`, description: 'The AI Router can now use this free-tier model.', variant: 'success' })
     onSaved()
   }
 
@@ -73,12 +77,12 @@ function ProviderCard({ row, index, total, onSaved }: { row: AIKeyRow; index: nu
         <CardHeader className="flex-row items-start justify-between space-y-0">
           <div>
             <CardTitle className="flex items-center gap-2 text-white">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-300">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-emerald-400">
                 <KeyRound className="h-4 w-4" />
               </span>
               {row.label}
             </CardTitle>
-            <CardDescription className="mt-2">{row.model} · {row.freeTierNote}</CardDescription>
+            <CardDescription className="mt-2">{row.freeTierNote}</CardDescription>
           </div>
           <div className="flex flex-col items-end gap-2">
             <Badge variant={configured && row.enabled ? 'success' : 'muted'}>{configured && row.enabled ? 'Ready' : 'Idle'}</Badge>
@@ -93,10 +97,10 @@ function ProviderCard({ row, index, total, onSaved }: { row: AIKeyRow; index: nu
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor={`key-${row.provider}`}>API key</Label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor={`key-${row.provider}`}>API key</Label>
+              <div className="relative">
                 <Input
                   id={`key-${row.provider}`}
                   type={show ? 'text' : 'password'}
@@ -109,8 +113,20 @@ function ProviderCard({ row, index, total, onSaved }: { row: AIKeyRow; index: nu
                   {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              <Button onClick={save} variant="secondary">Save</Button>
             </div>
+            <div className="space-y-1.5">
+              <Label htmlFor={`model-${row.provider}`}>Model</Label>
+              <Input
+                id={`model-${row.provider}`}
+                className="font-mono text-xs"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                placeholder={row.provider === 'gemini' ? 'gemini-2.5-flash' : 'llama-3.3-70b-versatile'}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={save} variant="secondary">Save</Button>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -202,7 +218,7 @@ export function VaultPage() {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-muted-foreground">{timeAgo(log.ts)}</span>
-                <Badge variant={log.status === 'success' ? 'success' : log.status === 'fallback' ? 'warning' : 'info'}>{log.status}</Badge>
+                <Badge variant={log.status === 'success' ? 'success' : log.status === 'fallback' ? 'warning' : 'info'}>{log.status === 'simulated' ? 'local' : log.status}</Badge>
               </div>
             </div>
           ))}

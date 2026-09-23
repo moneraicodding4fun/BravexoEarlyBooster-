@@ -24,25 +24,22 @@ Shopify, custom Lovable sites or any webhook.
 | `/portal/blog`     | Invited client | Headless Auto-Blog engine (SEO title / meta / tags / body)               |
 | `/portal/connect`  | Invited client | Bravexo Connect export console + Deploy Content                          |
 
-## Authentication & RBAC
+## Authentication & RBAC (no demo accounts, no fakes)
 
 - **Public sign-ups are disabled.** Registration is only possible via a
-  single-use invite link generated in the Admin Dashboard.
+  single-use invite link generated in the Admin Dashboard, or via the
+  Master Admin flow below.
 - **Strict admin lock:** exactly one email may self-register —
   `agencjakryspindadok@gmail.com` — and it automatically receives the
-  **Master Admin** role. This is enforced in code (`src/lib/auth.tsx`) **and**
-  at database level via trigger in `supabase/schema.sql`.
+  **Master Admin** role. Enforced in code (`src/lib/auth.tsx`) and at the
+  database level (`supabase/schema.sql` trigger + RLS).
+- **Gmail OTP:** Master Admin registration requires a 6-digit code emailed
+  to that Gmail (delivered through FormSubmit's free relay; the first ever
+  send triggers a one-time activation click). With Supabase configured,
+  server-side email OTP is used instead.
 - Invite links are single-use, revocable, and re-issuable per workspace.
-
-### Demo credentials (Demo Mode)
-
-| Role         | Email                            | Password            |
-| ------------ | -------------------------------- | ------------------- |
-| Master Admin | `agencjakryspindadok@gmail.com`  | `EarlyBooster!2026` |
-| Client       | `demo@luxeautospa.com`           | `ClientDemo!2026`   |
-
-An open invite for *Bloom & Vine Florals* is seeded too — copy its link from
-the Client Workspaces table to try the full invite → registration flow.
+- The local store starts empty — every client, draft and deployment you see
+  was created through the real product flows.
 
 ## Zero-cost AI Router
 
@@ -71,8 +68,8 @@ with zero keys configured — monthly AI spend stays at **$0.00**.
 ```
 
 - With a `webhookUrl` the relay forwards the draft to ANY external platform.
-- Without one (or with `dryRun: true`) it validates the payload and echoes it
-  back — perfect for demos and disconnected environments.
+- On pure static hosting the browser delivers straight to the webhook and
+  reports the honest result; `dryRun` remains an explicit validation mode.
 - CORS is open; the relay is designed as a universal, multi-tenant endpoint.
 
 ## Running
@@ -92,7 +89,7 @@ npm start          # relay serves dist/ + /api/bravexo/export on :8080
    `VITE_SUPABASE_ANON_KEY`.
 2. Apply `supabase/schema.sql` in the SQL editor (tables, RLS, and the
    signup trigger enforcing the admin lock + invite-only rule).
-3. Rebuild. The app auto-switches from Demo Mode to live Supabase.
+3. Rebuild. The app auto-switches from local persistence to live Supabase.
 
 ## Tech stack
 
