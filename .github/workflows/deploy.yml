@@ -2,7 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["arena/01a0cc0c-bravexoearlybooster"]
+    branches:
+      - "main"
+      - "arena/01a0cc0c-bravexoearlybooster"
   workflow_dispatch:
 
 permissions:
